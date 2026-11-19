@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Barbershop {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  logo        String?
+  coverImage  String?
+  address     String?
+  phone       String?  // WhatsApp phone format 5511999999999
+  instagram   String?
+  pixKey      String?
+  openingTime String   @default("09:00")
+  closingTime String   @default("20:00")
+  slotInterval Int     @default(30) // minutes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  barbers     Barber[]
+  services    Service[]
+  products    Product[]
+  bookings    Booking[]
+}
+
+model Barber {
+  id           String      @id @default(uuid())
+  name         String
+  role         String      @default("Barbeiro Profissional")
+  avatar       String?
+  phone        String?
+  bio          String?
+  rating       Float       @default(5.0)
+  active       Boolean     @default(true)
+  barbershopId String
+  barbershop   Barbershop  @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  bookings     Booking[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Service {
+  id           String      @id @default(uuid())
+  name         String
+  description  String?
+  price        Float
+  durationMin  Int         @default(30)
+  category     String      @default("Cabelo") // Cabelo, Barba, Combos, Estética
+  image        String?
+  active       Boolean     @default(true)
+  barbershopId String
+  barbershop   Barbershop  @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  bookings     BookingItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Product {
+  id           String      @id @default(uuid())
+  name         String
+  description  String?
+  price        Float
+  category     String      @default("Finalizadores")
+  image        String?
+  stock        Int         @default(10)
+  active       Boolean     @default(true)
+  barbershopId String
+  barbershop   Barbershop  @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Booking {
+  id           String       @id @default(uuid())
+  code         String       @unique // e.g. BBR-8942
+  clientName   String
+  clientPhone  String       // WhatsApp
+  clientNotes  String?
+  dateTime     DateTime
+  totalAmount  Float
+  status       String       @default("CONFIRMED") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  barbershopId String
+  barbershop   Barbershop   @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  barberId     String?
+  barber       Barber?      @relation(fields: [barberId], references: [id])
+  items        BookingItem[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model BookingItem {
+  id          String   @id @default(uuid())
+  bookingId   String
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  serviceId   String
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  price       Float
+}
