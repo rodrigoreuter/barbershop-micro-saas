@@ -2,7 +2,7 @@
 
 Projeto de demonstração (portfólio): plataforma de agendamento online para barbearias, com visual inspirado em interfaces da Apple.
 
-> **Demo:** _em breve_
+> **Demo:** https://barbershop-ten-taupe.vercel.app/ — barbearia de exemplo em [/royal-barber](https://barbershop-ten-taupe.vercel.app/royal-barber)
 
 ## Funcionalidades
 
